@@ -1,8 +1,8 @@
 package reflect;
 
-import bean.HelloService;
-import bean.HelloServiceImpl;
 import net.sf.cglib.proxy.Enhancer;
+import service.HelloService;
+import service.impl.HelloServiceImpl;
 
 /**
  * zhangjunyang 2018/1/29 22:05
