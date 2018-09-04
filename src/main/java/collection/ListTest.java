@@ -10,12 +10,23 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 public class ListTest {
     public static void main(String[] args) {
-        new ListTest().addEleToList();
+        new ListTest().asListTest();
+    }
+
+    public void asListTest() {
+        int[] arr = {1, 2, 3, 4, 5};
+        List list1 = Arrays.asList(arr);
+        System.out.println(list1.size());// 打印1，此时list中就一个元素，为数组
+
+        List list2 = Arrays.asList(1, 2, 3, 4, 5);
+        list2.forEach(System.out::println);
+        list2.add(6);// 报错：Unsupport
     }
 
     /**
      * ArrayList的克隆是深克隆
      */
+    @SuppressWarnings("unchecked")
     public void aboutClone() {
         ArrayList<String> listA = new ArrayList<>(Arrays.asList("a", "b", "d"));
         ArrayList<String> listB = (ArrayList<String>) listA.clone();
