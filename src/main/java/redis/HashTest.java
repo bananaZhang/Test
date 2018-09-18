@@ -35,7 +35,7 @@ public class HashTest {
         return jedis;
     }
 
-    public Long hset(String key, String field, String value) {
+    public Long hset(String key, String field, String value, int expireTime) {
         Long result;
         try (Jedis jedis = getJedis()) {
             result = jedis.hset(key, field, value);
@@ -47,6 +47,14 @@ public class HashTest {
         String result;
         try (Jedis jedis = getJedis()) {
             result = jedis.hget(key, field);
+        }
+        return result;
+    }
+
+    public String set(String key, String value) {
+        String result;
+        try (Jedis jedis = getJedis()) {
+            result = jedis.set(key, value);
         }
         return result;
     }
@@ -85,27 +93,8 @@ public class HashTest {
 
     public static void main(String[] args) throws InterruptedException {
         HashTest test = new HashTest();
-        test.hset("test:hash:store", "aaa", "111");// 以":"形式隔开在redis中以分级文件夹形式展示
+        test.hset("test:hash:store", "aaa", "111", 0);// 以":"形式隔开在redis中以分级文件夹形式展示
         System.out.println("redis get: " + test.hget("test:hash:store", "aaa"));
 
-//        final String channelName = "channel";
-//
-//        new Thread(() -> {
-//            test.subscribe(channelName);
-//        }).start();
-//
-//        System.out.println("subscribe success...");
-//
-//        Thread.sleep(2000);
-//
-//        System.out.println("start send message...");
-//
-//        test.publish(channelName, "send a message111");
-//        test.publish(channelName, "send a message222");
-//        test.publish(channelName, "send a message333");
-//        test.publish(channelName, "send a message444");
-//        test.publish(channelName, "send a message555");
-//
-//        System.out.println("send message end...");
     }
 }
