@@ -66,6 +66,20 @@
             <artifactId>cglib</artifactId>
             <version>3.2.7</version>
         </dependency>
+
+        <!-- rabbitmq -->
+        <dependency>
+            <groupId>com.rabbitmq</groupId>
+            <artifactId>amqp-client</artifactId>
+            <version>5.2.0</version>
+            <!--<exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-api</artifactId>
+                </exclusion>
+            </exclusions>-->
+        </dependency>
+
     </dependencies>
 
     <build>
