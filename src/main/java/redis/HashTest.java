@@ -43,6 +43,14 @@ public class HashTest {
         return result;
     }
 
+    public Long hsetnx(String key, String field, String value, int expireTime) {
+        Long result;
+        try (Jedis jedis = getJedis()) {
+            result = jedis.hsetnx(key, field, value);
+        }
+        return result;
+    }
+
     public String hget(String key, String field) {
         String result;
         try (Jedis jedis = getJedis()) {
@@ -93,8 +101,12 @@ public class HashTest {
 
     public static void main(String[] args) throws InterruptedException {
         HashTest test = new HashTest();
-        test.hset("test:hash:store", "aaa", "111", 0);// 以":"形式隔开在redis中以分级文件夹形式展示
-        System.out.println("redis get: " + test.hget("test:hash:store", "aaa"));
+        Long res = test.hsetnx("hash", "aaa", "111", 0);// 以":"形式隔开在redis中以分级文件夹形式展示
+        System.out.println("res = " + res);
+        System.out.println("redis get: " + test.hget("hash", "aaa"));
 
+        res = test.hsetnx("hash", "aaa", "222", 0);// 以":"形式隔开在redis中以分级文件夹形式展示
+        System.out.println("res = " + res);
+        System.out.println("redis get: " + test.hget("hash", "aaa"));
     }
 }
