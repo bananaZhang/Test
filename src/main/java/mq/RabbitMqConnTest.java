@@ -19,9 +19,10 @@ public class RabbitMqConnTest {
 		ConnectionFactory factory = new ConnectionFactory();
 
 		factory.setHost("39.105.8.99");
+		// 需要在rabbitmq的配置中增加该用户并赋予权限，默认的用户guest不允许远程访问
 		factory.setUsername("admin");
 		factory.setPassword("admin");
-		factory.setPort(15672);
+		factory.setPort(5672);
 		factory.setVirtualHost("/");
 		// 得到连接
 		Connection connection = factory.newConnection();
