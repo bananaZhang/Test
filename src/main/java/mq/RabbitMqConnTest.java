@@ -15,7 +15,31 @@ import java.util.concurrent.TimeoutException;
  */
 public class RabbitMqConnTest {
 
+	private static final String QUEUE_NAME = "Test";
+
 	public static void main(String[] args) throws IOException, TimeoutException {
+		ConnectionFactory factory = getFactory();
+		Connection connection;
+		Channel channel ;
+
+//		connection = factory.newConnection();
+//		channel = connection.createChannel();
+//		RabbitProducer producer = new RabbitProducer();
+//		producer.produce(channel, QUEUE_NAME, "Hello");
+//
+//		channel.close();
+//		connection.close();
+
+		connection = factory.newConnection();
+		channel = connection.createChannel();
+		RabbitConsumer consumer = new RabbitConsumer();
+		consumer.consume(channel, QUEUE_NAME);
+
+		channel.close();
+		connection.close();
+	}
+
+	private static ConnectionFactory getFactory() {
 		ConnectionFactory factory = new ConnectionFactory();
 
 		factory.setHost("39.105.8.99");
@@ -24,9 +48,7 @@ public class RabbitMqConnTest {
 		factory.setPassword("admin");
 		factory.setPort(5672);
 		factory.setVirtualHost("/");
-		// 得到连接
-		Connection connection = factory.newConnection();
-		//创建 channel实例
-		Channel channel = connection.createChannel();
+
+		return factory;
 	}
 }
