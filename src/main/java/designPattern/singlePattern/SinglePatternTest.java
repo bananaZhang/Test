@@ -1,4 +1,4 @@
-package designPattern;
+package designPattern.singlePattern;
 
 /**
  * zhangjunyang 2018/1/14 15:52
