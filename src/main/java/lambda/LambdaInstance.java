@@ -79,6 +79,16 @@ public class LambdaInstance {
         languages.stream().filter(e -> condition.test(e)).forEach(System.out::println);
     }
 
+    public void testFilter() {
+        List<String> list = Arrays.asList("java", "cafe", "lambda", "hik");
+        list.stream().filter(new Predicate<String>() {
+            @Override
+            public boolean test(String s) {
+                return s.length() > 5;
+            }
+        }).forEach(x -> System.out.print(x + " "));
+    }
+
     /* distinct方法, String、Integer均适用 */
     public void test7() {
         System.out.println("-------------->test7");
