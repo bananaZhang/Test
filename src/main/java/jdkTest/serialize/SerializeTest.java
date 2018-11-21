@@ -1,4 +1,4 @@
-package serialize;
+package jdkTest.serialize;
 
 import java.io.*;
 

@@ -1,4 +1,4 @@
-package strTest;
+package jdkTest.strTest;
 
 /**
  * String的intern方法
