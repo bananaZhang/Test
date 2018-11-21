@@ -9,7 +9,7 @@ import java.util.concurrent.TimeoutException;
 /**
  * @author ZJY
  * @ClassName: RabbitConnectionUtil
- * @Description: RabbitConnectionUtil
+ * @Description: https://www.cnblogs.com/LipeiNet/p/5977028.html
  * @date 2018/10/12 15:49
  */
 public class RabbitConnectionUtil {
