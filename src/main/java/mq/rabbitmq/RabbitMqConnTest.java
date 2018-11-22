@@ -14,11 +14,11 @@ import java.util.concurrent.TimeoutException;
  */
 public class RabbitMqConnTest {
 
-	private static final String QUEUE_NAME = "Test";
+    private static final String QUEUE_NAME = "Test";
 
-	public static void main(String[] args) throws IOException, TimeoutException {
-		Connection connection = RabbitConnectionUtil.getConnection();
-		Channel channel ;
+    public static void main(String[] args) throws IOException, TimeoutException {
+        Connection connection = RabbitConnectionUtil.getConnection();
+        Channel channel;
 
 //		channel = connection.createChannel();
 //		RabbitProducer producer = new RabbitProducer();
@@ -27,12 +27,12 @@ public class RabbitMqConnTest {
 //		channel.close();
 //		connection.close();
 
-		channel = connection.createChannel();
-		RabbitConsumer consumer = new RabbitConsumer();
-		consumer.consume(channel, QUEUE_NAME);
+        channel = connection.createChannel();
+        RabbitConsumer consumer = new RabbitConsumer();
+        consumer.consume(channel, QUEUE_NAME);
 
-		channel.close();
-		connection.close();
-	}
+        channel.close();
+        connection.close();
+    }
 
 }

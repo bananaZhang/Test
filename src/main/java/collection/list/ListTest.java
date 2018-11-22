@@ -39,7 +39,7 @@ public class ListTest {
 
     /**
      * 循环向数组中添加元素使用CopyOnWriteArrayList
-     * */
+     */
     public void addEleToList() {
         List<String> list = new ArrayList<>(Arrays.asList("a", "b", "c", "d"));
         for (String s : list) {
