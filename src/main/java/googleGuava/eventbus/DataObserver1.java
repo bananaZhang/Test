@@ -10,8 +10,8 @@ import com.google.common.eventbus.Subscribe;
  */
 public class DataObserver1 {
 
-	@Subscribe
-	public void handle(String msg) {
-		System.out.println("DataObserver1 get msg: " + msg);
-	}
+    @Subscribe
+    public void handle(String msg) {
+        System.out.println("DataObserver1 get msg: " + msg);
+    }
 }

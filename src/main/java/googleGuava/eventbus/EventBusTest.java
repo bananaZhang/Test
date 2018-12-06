@@ -8,20 +8,20 @@ package googleGuava.eventbus;
  */
 public class EventBusTest {
 
-	public static void main(String[] args) {
-		DataObserver1 observer1 = new DataObserver1();
-		DataObserver2 observer2 = new DataObserver2();
+    public static void main(String[] args) {
+        DataObserver1 observer1 = new DataObserver1();
+        DataObserver2 observer2 = new DataObserver2();
 
-		EventBusCenter.register(observer1);
-		EventBusCenter.register(observer2);
+        EventBusCenter.register(observer1);
+        EventBusCenter.register(observer2);
 
-		System.out.println("===== start =====");
-		EventBusCenter.post("post a string");
+        System.out.println("===== start =====");
+        EventBusCenter.post("post a string");
 
-		System.out.println("===== after unregister =====");
-		EventBusCenter.unregister(observer2);
-		EventBusCenter.post("post a string");
+        System.out.println("===== after unregister =====");
+        EventBusCenter.unregister(observer2);
+        EventBusCenter.post("post a string");
 
-		System.out.println("===== end =====");
-	}
+        System.out.println("===== end =====");
+    }
 }

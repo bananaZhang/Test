@@ -21,47 +21,47 @@ import java.util.concurrent.TimeUnit;
  * @date 2018/11/9 10:57
  */
 public class Test {
-	public static void main(String[] args) {
+    public static void main(String[] args) {
 
-	}
+    }
 
-	private void singleThread() {
-		// ListenableFutureTask通过静态create方法返回实例，还有一个重载方法，不太常用
-		ListenableFutureTask<String> task = ListenableFutureTask.create(() -> "");
+    private void singleThread() {
+        // ListenableFutureTask通过静态create方法返回实例，还有一个重载方法，不太常用
+        ListenableFutureTask<String> task = ListenableFutureTask.create(() -> "");
 
-		new Thread(task).start();
-		/**
-		 * 增加回调方法，MoreExecutors.directExecutor()返回guava默认的Executor，执行回调方法不会新开线程，
-		 * 所有回调方法都在当前线程做(可能是主线程或者执行ListenableFutureTask的线程，具体可以看最后面的代码)。
-		 * guava异步模块中参数有Executor的方法，一般还会有一个没有Executor参数的重载方法，使用的就是MoreExecutors.directExecutor()
-		 */
+        new Thread(task).start();
+        /**
+         * 增加回调方法，MoreExecutors.directExecutor()返回guava默认的Executor，执行回调方法不会新开线程，
+         * 所有回调方法都在当前线程做(可能是主线程或者执行ListenableFutureTask的线程，具体可以看最后面的代码)。
+         * guava异步模块中参数有Executor的方法，一般还会有一个没有Executor参数的重载方法，使用的就是MoreExecutors.directExecutor()
+         */
 
-		// listener是任务结束后的回调方法，executor是执行回调方法的执行器
-		task.addListener(() -> System.out.println("done"), MoreExecutors.directExecutor());
-	}
+        // listener是任务结束后的回调方法，executor是执行回调方法的执行器
+        task.addListener(() -> System.out.println("done"), MoreExecutors.directExecutor());
+    }
 
-	private void multiThread() {
-		// 创建线程池
-		ThreadPoolExecutor poolExecutor = new ThreadPoolExecutor(
-				5,
-				5,
-				0,
-				TimeUnit.SECONDS,
-				new ArrayBlockingQueue<>(100),
-				new CustomizableThreadFactory("demo"),
-				new ThreadPoolExecutor.DiscardPolicy());
-		// guava的接口ListeningExecutorService继承了jdk原生ExecutorService接口，重写了submit方法，修改返回值类型为ListenableFuture
-		ListeningExecutorService listeningExecutorService = MoreExecutors.listeningDecorator(poolExecutor);
+    private void multiThread() {
+        // 创建线程池
+        ThreadPoolExecutor poolExecutor = new ThreadPoolExecutor(
+                5,
+                5,
+                0,
+                TimeUnit.SECONDS,
+                new ArrayBlockingQueue<>(100),
+                new CustomizableThreadFactory("demo"),
+                new ThreadPoolExecutor.DiscardPolicy());
+        // guava的接口ListeningExecutorService继承了jdk原生ExecutorService接口，重写了submit方法，修改返回值类型为ListenableFuture
+        ListeningExecutorService listeningExecutorService = MoreExecutors.listeningDecorator(poolExecutor);
 
-		// 获得一个随着jvm关闭而关闭的线程池，通过Runtime.getRuntime().addShutdownHook(hook)实现
-		// 修改ThreadFactory为创建守护线程，默认jvm关闭时最多等待120秒关闭线程池，重载方法可以设置时间
-		ExecutorService newPoolExecutor = MoreExecutors.getExitingExecutorService(poolExecutor);
+        // 获得一个随着jvm关闭而关闭的线程池，通过Runtime.getRuntime().addShutdownHook(hook)实现
+        // 修改ThreadFactory为创建守护线程，默认jvm关闭时最多等待120秒关闭线程池，重载方法可以设置时间
+        ExecutorService newPoolExecutor = MoreExecutors.getExitingExecutorService(poolExecutor);
 
-		// 只增加关闭线程池的钩子，不改变ThreadFactory
-		MoreExecutors.addDelayedShutdownHook(poolExecutor, 120, TimeUnit.SECONDS);
+        // 只增加关闭线程池的钩子，不改变ThreadFactory
+        MoreExecutors.addDelayedShutdownHook(poolExecutor, 120, TimeUnit.SECONDS);
 
-		// 像线程池提交任务，并得到ListenableFuture
-		ListenableFuture<String> listenableFuture = listeningExecutorService.submit(() -> "");
-		// 可以通过addListener对listenableFuture注册回调，但是通常使用Futures中的工具方法
-	}
+        // 像线程池提交任务，并得到ListenableFuture
+        ListenableFuture<String> listenableFuture = listeningExecutorService.submit(() -> "");
+        // 可以通过addListener对listenableFuture注册回调，但是通常使用Futures中的工具方法
+    }
 }
