@@ -13,7 +13,7 @@ import java.util.Map;
 public class MapsDemo {
 
     public static void main(String[] args) {
-        biMap();
+        multiMap();
     }
 
     /**
@@ -53,5 +53,19 @@ public class MapsDemo {
 
         System.out.println(biMap);
         System.out.println(biMap.inverse().get("B"));
+    }
+
+    /**
+     * 一键多值的map，类似于Map<String, List<String>>结构
+     */
+    public static void multiMap() {
+        Multimap<String, String> multimap = ArrayListMultimap.create();
+        multimap.put("fruit", "apple");
+        multimap.put("fruit", "banana");
+        multimap.put("pet", "dog");
+        multimap.put("pet", "cat");
+
+        System.out.println(multimap);
+        System.out.println(multimap.get("fruit"));
     }
 }
