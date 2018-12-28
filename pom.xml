@@ -59,6 +59,12 @@
             <groupId>com.google.zxing</groupId>
             <artifactId>javase</artifactId>
             <version>3.3.3</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>jai-imageio-core</artifactId>
+                    <groupId>com.github.jai-imageio</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
