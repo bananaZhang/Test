@@ -1,10 +1,4 @@
-import sun.misc.BASE64Decoder;
-import sun.misc.BASE64Encoder;
-
-import java.net.InetAddress;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Base64;
 import java.util.List;
 
 /**
@@ -15,22 +9,10 @@ import java.util.List;
  */
 public class Test {
     public static void main(String[] args) throws Exception {
-        Integer taskId = 10605;
-        String s = new BASE64Encoder().encode(taskId.toString().getBytes());
-        System.out.println(s);
-
-        String sss = new String(org.apache.commons.codec.binary.Base64.encodeBase64(taskId.toString().getBytes()));
-        System.out.println(sss);
-
-        String re = new String(org.apache.commons.codec.binary.Base64.decodeBase64(sss.getBytes()));
-        System.out.println(re);
-//        for (; taskId < 10500; taskId ++) {
-//            String temp = new BASE64Encoder().encode(taskId.toString().getBytes());
-//            System.out.println(temp);
-//        }
-//
-//        String result = new String(new BASE64Decoder().decodeBuffer(s));
-//        System.out.println(result);
+        List<String> list = Arrays.asList("abc", " edf", "qqq ", " 12345 ");
+        for (String s : list) {
+            s = s.trim();
+        }
+        list.forEach(System.out::println);
     }
-
 }
