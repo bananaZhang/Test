@@ -17,29 +17,57 @@ import java.util.Random;
 public class JdbcTest {
 
     public static void main(String[] args) {
+        long start = new Date().getTime();
+        String memorySql = "SELECT\n" +
+                "\t id taskId, task_status, modality, patient_name, accession_no,\n" +
+                "\t patient_id, patient_sex, allot_time, ai_tag, study_iuid,\n" +
+                "\t reject_tag, reject_date, report_doctor_id,\n" +
+                "\t review_doctor_id, update_time, study_datetime, from_org_no,\n" +
+                "\t to_org_no, task_level, create_time \n" +
+                "FROM\n" +
+                "\t dw_doctor_task\n" +
+                "WHERE 1=1\n" +
+                "\t AND task_level = 0 \n" +
+                "\t AND report_doctor_id IS NULL \n" +
+                "\t AND task_status IN ( 101, 102, 201 ) \n" +
+                "\t AND to_org_no IN ( 'sr_test_0001_001' ) \n" +
+                "\t AND create_time >= '2018-11-11 03:00:00'\n" +
+                "\t AND create_time < '2018-11-11 11:59:59' \n" +
+                "ORDER BY\n" +
+                "create_time DESC limit 50";
+
+        queryWithSql(memorySql);
+        System.out.println("memory engine查询100次耗时：" + (new Date().getTime() - start));
+
+        String innodbSql = "SELECT\n" +
+                "\t id taskId, task_status, modality, patient_name, accession_no,\n" +
+                "\t patient_id, patient_sex, allot_time, ai_tag, study_iuid,\n" +
+                "\t reject_tag, reject_date, report_doctor_id,\n" +
+                "\t review_doctor_id, update_time, study_datetime, from_org_no,\n" +
+                "\t to_org_no, task_level, create_time \n" +
+                "FROM\n" +
+                "\t dw_doctor_task_innoDB\n" +
+                "WHERE 1=1\n" +
+                "\t AND task_level = 0 \n" +
+                "\t AND report_doctor_id IS NULL \n" +
+                "\t AND task_status IN ( 101, 102, 201 ) \n" +
+                "\t AND to_org_no IN ( 'sr_test_0001_001' ) \n" +
+                "\t AND create_time >= '2018-11-11 03:00:00'\n" +
+                "\t AND create_time < '2018-11-11 11:59:59' \n" +
+                "ORDER BY\n" +
+                "create_time DESC limit 50";
+
+        start = new Date().getTime();
+        queryWithSql(innodbSql);
+        System.out.println("innodb engine查询100次耗时：" + (new Date().getTime() - start));
+    }
+
+    private static void queryWithSql(String sql) {
         try {
             Connection conn = DriverManager.getConnection("jdbc:mysql://39.105.8.99/ris", "root", "Zjy12345+");
             Statement statement = conn.createStatement();
 
-            long start = new Date().getTime();
             for (int i = 0; i < 100; i ++) {
-                String sql = "SELECT\n" +
-                        "\t id taskId, task_status, modality, patient_name, accession_no,\n" +
-                        "\t patient_id, patient_sex, allot_time, ai_tag, study_iuid,\n" +
-                        "\t reject_tag, reject_date, report_doctor_id,\n" +
-                        "\t review_doctor_id, update_time, study_datetime, from_org_no,\n" +
-                        "\t to_org_no, task_level, create_time \n" +
-                        "FROM\n" +
-                        "\t dw_doctor_task\n" +
-                        "WHERE 1=1\n" +
-                        "\t AND task_level = 0 \n" +
-                        "\t AND report_doctor_id IS NULL \n" +
-                        "\t AND task_status IN ( 101, 102, 201 ) \n" +
-                        "\t AND to_org_no IN ( 'sr_test_0001_001' ) \n" +
-                        "\t AND create_time >= '2018-11-11 03:00:00'\n" +
-                        "\t AND create_time < '2018-11-11 11:59:59' \n" +
-                        "ORDER BY\n" +
-                        "create_time DESC limit 50";
                 ResultSet rs = statement.executeQuery(sql);
 
 //                while (rs.next()) {
@@ -52,12 +80,15 @@ public class JdbcTest {
             }
             conn.close();
 //            prepareData(13000);
-            System.out.println("memory engine查询100次耗时：" + (new Date().getTime() - start));
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
+    /**
+     * @function 插入给定数量的数据
+     * @author ZJY 2018/12/28 20:49
+     */
     private static void prepareData(int num) throws Exception {
         Connection conn = DriverManager.getConnection("jdbc:mysql://39.105.8.99/ris", "root", "Zjy12345+");
         PreparedStatement pstmt = conn.prepareStatement("insert into dw_doctor_task ( patient_id, study_iuid, patient_sex, from_org_no, to_org_no, " +
@@ -88,6 +119,9 @@ public class JdbcTest {
         conn.close();
     }
 
+    /**
+     * 获取给定范围内的一个随机时间
+     */
     private static Date getRandomDate(String beginDate, String endDate) throws Exception {
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
         Date start = format.parse(beginDate);
@@ -99,6 +133,9 @@ public class JdbcTest {
         return new Date(date);
     }
 
+    /**
+     * 获取给定时间范围内的一个时间戳
+     */
     private static long random(long begin, long end) {
         long rtn = (long) (begin + Math.random() * (end - begin));
         if (rtn == begin || rtn == end) {
