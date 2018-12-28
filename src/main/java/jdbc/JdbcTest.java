@@ -21,18 +21,38 @@ public class JdbcTest {
             Connection conn = DriverManager.getConnection("jdbc:mysql://39.105.8.99/ris", "root", "Zjy12345+");
             Statement statement = conn.createStatement();
 
-            String sql = "select * from memory_table where id = 3";
-            ResultSet rs = statement.executeQuery(sql);
+            long start = new Date().getTime();
+            for (int i = 0; i < 100; i ++) {
+                String sql = "SELECT\n" +
+                        "\t id taskId, task_status, modality, patient_name, accession_no,\n" +
+                        "\t patient_id, patient_sex, allot_time, ai_tag, study_iuid,\n" +
+                        "\t reject_tag, reject_date, report_doctor_id,\n" +
+                        "\t review_doctor_id, update_time, study_datetime, from_org_no,\n" +
+                        "\t to_org_no, task_level, create_time \n" +
+                        "FROM\n" +
+                        "\t dw_doctor_task\n" +
+                        "WHERE 1=1\n" +
+                        "\t AND task_level = 0 \n" +
+                        "\t AND report_doctor_id IS NULL \n" +
+                        "\t AND task_status IN ( 101, 102, 201 ) \n" +
+                        "\t AND to_org_no IN ( 'sr_test_0001_001' ) \n" +
+                        "\t AND create_time >= '2018-11-11 03:00:00'\n" +
+                        "\t AND create_time < '2018-11-11 11:59:59' \n" +
+                        "ORDER BY\n" +
+                        "create_time DESC limit 50";
+                ResultSet rs = statement.executeQuery(sql);
 
-//            while (rs.next()) {
-//                String name = rs.getString("name");
-//                int age = rs.getInt("age");
+//                while (rs.next()) {
+//                    String name = rs.getString("name");
+//                    int age = rs.getInt("age");
 //
-//                System.out.println("name = " + name + ", age = " + age);
-//            }
-            rs.close();
+//                    System.out.println("name = " + name + ", age = " + age);
+//                }
+                rs.close();
+            }
             conn.close();
 //            prepareData(13000);
+            System.out.println("memory engine查询100次耗时：" + (new Date().getTime() - start));
         } catch (Exception e) {
             e.printStackTrace();
         }
