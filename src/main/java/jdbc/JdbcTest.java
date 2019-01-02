@@ -6,6 +6,7 @@ import designPattern.statePattern.State;
 import java.sql.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
@@ -32,28 +33,46 @@ public class JdbcTest {
     private static final String PROCESS_SQL = "SELECT id taskId, task_status, patient_name, patient_sex, patient_id, modality, task_level, allot_time, accession_no, study_datetime, update_time, operate_id, ai_tag, from_org_no, to_org_no, reject_tag, reject_date, report_doctor_id, review_doctor_id, study_iuid, create_time, (CASE WHEN from_org_no = 'sr_test_0001_001' THEN 0 ELSE 1 END) fromTag, (CASE WHEN to_org_no = 'sr_test_0001_001' THEN 0 ELSE 1 END) toTag " +
             "FROM dw_doctor_task dt WHERE 1 = 1 AND create_time >= '2018-11-11 03:00:00' AND create_time < '2018-11-11 11:59:59' AND from_org_no = 'sr_test_0001_001' AND to_org_no = 'sr_test_0001_001' AND task_status IN (301, 302, 303, 304, 305) order by update_time DESC limit 50";
 
-    private static final String OPERATOR_ALL = "SELECT id taskId, patient_name, patient_sex, patient_id, modality, task_status, study_iuid, ai_tag, task_level, accession_no, study_datetime, update_time, from_org_no, to_org_no, create_time, ai_complete_time, (CASE WHEN from_org_no = ? THEN 0 ELSE 1 END) fromTag, (CASE WHEN to_org_no = ? THEN 0 ELSE 1 END) toTag " +
+    private static final String OPERATOR_ALL = "SELECT id taskId, patient_name, patient_sex, patient_id, modality, task_status, study_iuid, ai_tag, task_level, accession_no, study_datetime, update_time, from_org_no, to_org_no, create_time, (CASE WHEN from_org_no = 'sr_test_0001_001' THEN 0 ELSE 1 END) fromTag, (CASE WHEN to_org_no = 'sr_test_0001_001' THEN 0 ELSE 1 END) toTag " +
             "FROM dw_doctor_task dt WHERE (from_org_no = 'sr_test_0001_001' OR to_org_no = 'sr_test_0001_001') AND task_status != 402 AND create_time >= '2018-11-11 03:00:00' AND create_time < '2018-11-11 11:59:59' order by update_time DESC limit 50";
 
-    private static final String NO_REPORT = "SELECT * FROM ((SELECT id taskId, task_status, modality, patient_name, accession_no, patient_id, patient_sex, allot_time, ai_tag, study_iuid, ai_complete_time, reject_tag, reject_date, report_doctor_id, review_doctor_id, update_time, study_datetime, from_org_no, to_org_no, task_level, create_time FROM dw_doctor_task WHERE task_level = 0 AND report_doctor_id = ? AND task_status IN (301, 302) AND create_time >= ? AND create_time < ? ORDER BY CASE WHEN report_doctor_id = ? THEN 1 ELSE 2 END ASC, study_datetime DESC) " +
-            "UNION ALL (SELECT id taskId, task_status, modality, patient_name, accession_no, patient_id, patient_sex, allot_time, ai_tag, study_iuid, ai_complete_time, reject_tag, reject_date, report_doctor_id, review_doctor_id, update_time, study_datetime, from_org_no, to_org_no, task_level, create_time FROM dw_doctor_task WHERE task_level = 0 AND create_time >= ? AND create_time < ? AND report_doctor_id IS NULL AND task_status IN (101, 102, 201) AND to_org_no IN (?))) AS TEMP WHERE 1 = 1 AND task_level = ? AND create_time >= ? AND create_time < ? ";
+    private static final String NO_REPORT = "SELECT * FROM ((SELECT id taskId, task_status, modality, patient_name, accession_no, patient_id, patient_sex, allot_time, ai_tag, study_iuid, reject_tag, reject_date, report_doctor_id, review_doctor_id, update_time, study_datetime, from_org_no, to_org_no, task_level, create_time FROM dw_doctor_task WHERE task_level = 0 AND report_doctor_id = 110110 AND task_status IN (301, 302) AND create_time >= '2018-11-11 03:00:00' AND create_time < '2018-11-11 11:59:59' ORDER BY CASE WHEN report_doctor_id = 110110 THEN 1 ELSE 2 END ASC, study_datetime DESC) " +
+            "UNION ALL (SELECT id taskId, task_status, modality, patient_name, accession_no, patient_id, patient_sex, allot_time, ai_tag, study_iuid, reject_tag, reject_date, report_doctor_id, review_doctor_id, update_time, study_datetime, from_org_no, to_org_no, task_level, create_time FROM dw_doctor_task WHERE task_level = 0 AND create_time >= '2018-11-11 03:00:00' AND create_time < '2018-11-11 11:59:59' AND report_doctor_id IS NULL AND task_status IN (101, 102, 201) AND to_org_no IN ('sr_test_0001_001'))) AS TEMP WHERE 1 = 1 AND task_level = 0 AND create_time >= '2018-11-11 03:00:00' AND create_time < '2018-11-11 11:59:59' order by study_datetime limit 50";
+
+    private static final String DOCTOR_ALL = "SELECT id taskId, task_status, modality, patient_name, accession_no, patient_id, patient_sex, allot_time, ai_tag, study_iuid, reject_tag, reject_date, report_doctor_id, review_doctor_id, update_time, study_datetime, from_org_no, to_org_no, task_level, create_time " +
+            "FROM dw_doctor_task WHERE task_status < 402 AND (from_org_no IN ('sr_test_0001_001') OR to_org_no IN ('sr_test_0001_001')) AND create_time >= '2018-11-11 03:00:00' AND create_time < '2018-11-11 11:59:59' order by study_datetime desc limit 50";
+
+    private static final String INSERT = "INSERT INTO dw_doctor_task(task_status, modality, patient_name, accession_no, patient_id, patient_sex, allot_time, ai_tag, study_iuid, reject_tag, reject_date, report_doctor_id, review_doctor_id, update_time, study_datetime, from_org_no, to_org_no, task_level, create_time) " +
+            "VALUES (101, NULL, NULL, NULL, patientId, 'M', NULL, 0, studyUid, 0, NULL, NULL, NULL, updateTime, NULL, 'sr_test_0001_001', 'sr_test_0001_001', 0, createTime)";
 
     public static void main(String[] args) throws Exception {
-        List<String> sqlList = Lists.newArrayList(NO_ALLOT_SQL);
+        List<String> sqlList = Lists.newArrayList(NO_ALLOT_SQL, PROCESS_SQL, OPERATOR_ALL, NO_REPORT, DOCTOR_ALL);
+        long start = new Date().getTime();
         for (String sql : sqlList) {
-            long start = new Date().getTime();
             String memorySql = sql.replace("dw_doctor_task", "dw_doctor_task_memory");
 
-            queryWithSql(memorySql);
+            queryWithSql(memorySql, 100);
             System.out.println("memory engine查询100次耗时：" + (new Date().getTime() - start));
 
             String innodbSql = sql.replace("dw_doctor_task", "dw_doctor_task_innoDB");
 
             start = new Date().getTime();
-            queryWithSql(innodbSql);
+            queryWithSql(innodbSql, 100);
             System.out.println("innodb engine查询100次耗时：" + (new Date().getTime() - start));
+
+            System.out.println("------------------------");
         }
 
+        start = new Date().getTime();
+        String memoryInsert = INSERT.replace("dw_doctor_task", "dw_doctor_task_memory");
+        insertWithSql(memoryInsert, 50);
+        System.out.println("memory engine插入50条数据耗时：" + (new Date().getTime() - start));
+        start = new Date().getTime();
+        String innodbInsert = INSERT.replace("dw_doctor_task", "dw_doctor_task_innoDB");
+        insertWithSql(innodbInsert, 50);
+        System.out.println("innodb engine插入50条数据耗时：" + (new Date().getTime() - start));
+
+        Thread.sleep(1000);
 //        JdbcTest test = new JdbcTest();
 //        PrepareDataTask task = test.new PrepareDataTask();
 //        for (int i = 0; i < 10; i++) {
@@ -61,12 +80,33 @@ public class JdbcTest {
 //        }
     }
 
-    private static void queryWithSql(String sql) {
+    private static void insertWithSql(String sql, int num) {
         try {
             Connection conn = DriverManager.getConnection("jdbc:mysql://39.105.8.99/ris", "root", "Zjy12345+");
             Statement statement = conn.createStatement();
 
-            for (int i = 0; i < 100; i ++) {
+            Random random = new Random();
+            for (int i = 0; i < num; i ++) {
+                String date = LocalDateTime.now().toString();
+                String newSql = sql.replace("patientId", "\'" + "test" + random.nextInt() + "\'")
+                        .replace("studyUid", "\'" + "test" + random.nextInt() + "\'")
+                        .replace("createTime", "\'" + date + "\'")
+                        .replace("updateTime", "\'" + date + "\'");
+//                System.out.println(newSql);
+                statement.executeUpdate(newSql);
+            }
+            conn.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void queryWithSql(String sql, int num) {
+        try {
+            Connection conn = DriverManager.getConnection("jdbc:mysql://39.105.8.99/ris", "root", "Zjy12345+");
+            Statement statement = conn.createStatement();
+
+            for (int i = 0; i < num; i ++) {
 //                Date startDate = new Date();
                 ResultSet rs = statement.executeQuery(sql);
 //                System.out.println("第" + (i+1) + "次执行耗时: " + (new Date().getTime() - startDate.getTime()));

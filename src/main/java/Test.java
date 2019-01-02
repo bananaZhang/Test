@@ -1,4 +1,6 @@
+import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -9,10 +11,12 @@ import java.util.List;
  */
 public class Test {
     public static void main(String[] args) throws Exception {
-        List<String> list = Arrays.asList("abc", " edf", "qqq ", " 12345 ");
-        for (String s : list) {
-            s = s.trim();
-        }
-        list.forEach(System.out::println);
+//        List<String> list = Arrays.asList("abc", " edf", "qqq ", " 12345 ");
+//        for (String s : list) {
+//            s = s.trim();
+//        }
+//        list.forEach(System.out::println);
+
+        System.out.println(LocalDateTime.now().toString());
     }
 }
