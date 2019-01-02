@@ -1,11 +1,13 @@
 package jdbc;
 
+import com.google.common.collect.Lists;
 import designPattern.statePattern.State;
 
 import java.sql.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -24,50 +26,33 @@ public class JdbcTest {
     // 累加器
     private volatile int count = 0;
 
+    private static final String NO_ALLOT_SQL = "SELECT id taskId, task_status, patient_name, patient_sex, patient_id, modality, ai_tag, accession_no, study_iuid, study_datetime, create_time, from_org_no, to_org_no, abandon_reason, abandon_time, task_level, (CASE WHEN from_org_no = 'sr_test_0001_001' THEN 0 ELSE 1 END) fromTag " +
+            "FROM dw_doctor_task dt WHERE 1 = 1 AND create_time >= '2018-11-11 03:00:00' AND create_time < '2018-11-11 11:59:59' AND from_org_no = 'sr_test_0001_001' AND task_status IN (101, 102, 103) order by create_time DESC limit 50";
+
+    private static final String PROCESS_SQL = "SELECT id taskId, task_status, patient_name, patient_sex, patient_id, modality, task_level, allot_time, accession_no, study_datetime, update_time, operate_id, ai_tag, from_org_no, to_org_no, reject_tag, reject_date, report_doctor_id, review_doctor_id, study_iuid, create_time, (CASE WHEN from_org_no = 'sr_test_0001_001' THEN 0 ELSE 1 END) fromTag, (CASE WHEN to_org_no = 'sr_test_0001_001' THEN 0 ELSE 1 END) toTag " +
+            "FROM dw_doctor_task dt WHERE 1 = 1 AND create_time >= '2018-11-11 03:00:00' AND create_time < '2018-11-11 11:59:59' AND from_org_no = 'sr_test_0001_001' AND to_org_no = 'sr_test_0001_001' AND task_status IN (301, 302, 303, 304, 305) order by update_time DESC limit 50";
+
+    private static final String OPERATOR_ALL = "SELECT id taskId, patient_name, patient_sex, patient_id, modality, task_status, study_iuid, ai_tag, task_level, accession_no, study_datetime, update_time, from_org_no, to_org_no, create_time, ai_complete_time, (CASE WHEN from_org_no = ? THEN 0 ELSE 1 END) fromTag, (CASE WHEN to_org_no = ? THEN 0 ELSE 1 END) toTag " +
+            "FROM dw_doctor_task dt WHERE (from_org_no = 'sr_test_0001_001' OR to_org_no = 'sr_test_0001_001') AND task_status != 402 AND create_time >= '2018-11-11 03:00:00' AND create_time < '2018-11-11 11:59:59' order by update_time DESC limit 50";
+
+    private static final String NO_REPORT = "SELECT * FROM ((SELECT id taskId, task_status, modality, patient_name, accession_no, patient_id, patient_sex, allot_time, ai_tag, study_iuid, ai_complete_time, reject_tag, reject_date, report_doctor_id, review_doctor_id, update_time, study_datetime, from_org_no, to_org_no, task_level, create_time FROM dw_doctor_task WHERE task_level = 0 AND report_doctor_id = ? AND task_status IN (301, 302) AND create_time >= ? AND create_time < ? ORDER BY CASE WHEN report_doctor_id = ? THEN 1 ELSE 2 END ASC, study_datetime DESC) " +
+            "UNION ALL (SELECT id taskId, task_status, modality, patient_name, accession_no, patient_id, patient_sex, allot_time, ai_tag, study_iuid, ai_complete_time, reject_tag, reject_date, report_doctor_id, review_doctor_id, update_time, study_datetime, from_org_no, to_org_no, task_level, create_time FROM dw_doctor_task WHERE task_level = 0 AND create_time >= ? AND create_time < ? AND report_doctor_id IS NULL AND task_status IN (101, 102, 201) AND to_org_no IN (?))) AS TEMP WHERE 1 = 1 AND task_level = ? AND create_time >= ? AND create_time < ? ";
+
     public static void main(String[] args) throws Exception {
-        long start = new Date().getTime();
-        String memorySql = "SELECT\n" +
-                "\t id taskId, task_status, modality, patient_name, accession_no,\n" +
-                "\t patient_id, patient_sex, allot_time, ai_tag, study_iuid,\n" +
-                "\t reject_tag, reject_date, report_doctor_id,\n" +
-                "\t review_doctor_id, update_time, study_datetime, from_org_no,\n" +
-                "\t to_org_no, task_level, create_time \n" +
-                "FROM\n" +
-                "\t dw_doctor_task_memory\n" +
-                "WHERE 1=1\n" +
-                "\t AND task_level = 0 \n" +
-                "\t AND report_doctor_id IS NULL \n" +
-                "\t AND task_status IN ( 101, 102, 201 ) \n" +
-                "\t AND to_org_no IN ( 'sr_test_0001_001' ) \n" +
-                "\t AND create_time >= '2018-11-11 03:00:00'\n" +
-                "\t AND create_time < '2018-11-11 11:59:59' \n" +
-                "ORDER BY\n" +
-                "create_time DESC limit 50";
+        List<String> sqlList = Lists.newArrayList(NO_ALLOT_SQL);
+        for (String sql : sqlList) {
+            long start = new Date().getTime();
+            String memorySql = sql.replace("dw_doctor_task", "dw_doctor_task_memory");
 
-        queryWithSql(memorySql);
-        System.out.println("memory engine查询100次耗时：" + (new Date().getTime() - start));
+            queryWithSql(memorySql);
+            System.out.println("memory engine查询100次耗时：" + (new Date().getTime() - start));
 
-        String innodbSql = "SELECT\n" +
-                "\t id taskId, task_status, modality, patient_name, accession_no,\n" +
-                "\t patient_id, patient_sex, allot_time, ai_tag, study_iuid,\n" +
-                "\t reject_tag, reject_date, report_doctor_id,\n" +
-                "\t review_doctor_id, update_time, study_datetime, from_org_no,\n" +
-                "\t to_org_no, task_level, create_time \n" +
-                "FROM\n" +
-                "\t dw_doctor_task_innoDB\n" +
-                "WHERE 1=1\n" +
-                "\t AND task_level = 0 \n" +
-                "\t AND report_doctor_id IS NULL \n" +
-                "\t AND task_status IN ( 101, 102, 201 ) \n" +
-                "\t AND to_org_no IN ( 'sr_test_0001_001' ) \n" +
-                "\t AND create_time >= '2018-11-11 03:00:00'\n" +
-                "\t AND create_time < '2018-11-11 11:59:59' \n" +
-                "ORDER BY\n" +
-                "create_time DESC limit 50";
+            String innodbSql = sql.replace("dw_doctor_task", "dw_doctor_task_innoDB");
 
-        start = new Date().getTime();
-        queryWithSql(innodbSql);
-        System.out.println("innodb engine查询100次耗时：" + (new Date().getTime() - start));
+            start = new Date().getTime();
+            queryWithSql(innodbSql);
+            System.out.println("innodb engine查询100次耗时：" + (new Date().getTime() - start));
+        }
 
 //        JdbcTest test = new JdbcTest();
 //        PrepareDataTask task = test.new PrepareDataTask();
@@ -82,7 +67,9 @@ public class JdbcTest {
             Statement statement = conn.createStatement();
 
             for (int i = 0; i < 100; i ++) {
+//                Date startDate = new Date();
                 ResultSet rs = statement.executeQuery(sql);
+//                System.out.println("第" + (i+1) + "次执行耗时: " + (new Date().getTime() - startDate.getTime()));
 
 //                while (rs.next()) {
 //                    String name = rs.getString("name");
@@ -113,7 +100,6 @@ public class JdbcTest {
                     String patientSex = "M";
                     String orgNo = "sr_test_0001_001";
                     Date createTime = getRandomDate("2018-11-11", "2018-11-13");
-                    Date updateTime = createTime;
 
                     pstmt.setString(1, patientId);
                     pstmt.setString(2, studyUid);
@@ -121,7 +107,7 @@ public class JdbcTest {
                     pstmt.setString(4, orgNo);
                     pstmt.setString(5, orgNo);
                     pstmt.setTimestamp(6, new java.sql.Timestamp(createTime.getTime()));
-                    pstmt.setTimestamp(7, new java.sql.Timestamp(updateTime.getTime()));
+                    pstmt.setTimestamp(7, new java.sql.Timestamp(createTime.getTime()));
                     try {
                         pstmt.execute();
                     } catch (Exception e) {}
@@ -134,30 +120,30 @@ public class JdbcTest {
                 System.out.println(e);
             }
         }
-    }
 
-    /**
-     * 获取给定范围内的一个随机时间
-     */
-    private static Date getRandomDate(String beginDate, String endDate) throws Exception {
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-        Date start = format.parse(beginDate);
-        Date end = format.parse(endDate);
-        if (start.getTime() >= end.getTime()) {
-            return null;
+        /**
+         * 获取给定范围内的一个随机时间
+         */
+        private Date getRandomDate(String beginDate, String endDate) throws Exception {
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+            Date start = format.parse(beginDate);
+            Date end = format.parse(endDate);
+            if (start.getTime() >= end.getTime()) {
+                return null;
+            }
+            long date = random(start.getTime(), end.getTime());
+            return new Date(date);
         }
-        long date = random(start.getTime(), end.getTime());
-        return new Date(date);
-    }
 
-    /**
-     * 获取给定时间范围内的一个时间戳
-     */
-    private static long random(long begin, long end) {
-        long rtn = (long) (begin + Math.random() * (end - begin));
-        if (rtn == begin || rtn == end) {
-            return random(begin, end);
+        /**
+         * 获取给定时间范围内的一个时间戳
+         */
+        private long random(long begin, long end) {
+            long rtn = (long) (begin + Math.random() * (end - begin));
+            if (rtn == begin || rtn == end) {
+                return random(begin, end);
+            }
+            return rtn;
         }
-        return rtn;
     }
 }
