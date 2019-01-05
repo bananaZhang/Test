@@ -48,29 +48,31 @@ public class JdbcTest {
     public static void main(String[] args) throws Exception {
         List<String> sqlList = Lists.newArrayList(NO_ALLOT_SQL, PROCESS_SQL, OPERATOR_ALL, NO_REPORT, DOCTOR_ALL);
         long start = new Date().getTime();
-        for (String sql : sqlList) {
-            String memorySql = sql.replace("dw_doctor_task", "dw_doctor_task_memory");
+//        for (String sql : sqlList) {
+//            String memorySql = sql.replace("dw_doctor_task", "dw_doctor_task_memory");
 
-            queryWithSql(memorySql, 100);
-            System.out.println("memory engine查询100次耗时：" + (new Date().getTime() - start));
-
-            String innodbSql = sql.replace("dw_doctor_task", "dw_doctor_task_innoDB");
+//            queryWithSql(memorySql, 100);
+//            System.out.println("memory engine查询100次耗时：" + (new Date().getTime() - start));
+//
+            //create_time <= '2018-12-12 14:00:00' and create_time > '2018-12-12 12:00:00' and accession_no like '%CT1805210190%'
+            String innodbSql = "SELECT id taskId, task_status, patient_name, patient_sex, patient_id, modality, ai_tag, accession_no, study_iuid, study_datetime, create_time, from_org_no, to_org_no, abandon_reason, abandon_time, task_level, (CASE WHEN from_org_no = 'sr_test_0009_001' THEN 0 ELSE 1 END) fromTag " +
+                    "FROM dw_doctor_task dt WHERE 1 = 1 AND create_time <= '2018-12-12 14:00:00' and create_time > '2018-12-12 12:00:00' AND from_org_no = 'sr_test_0009_001' AND task_status IN (101, 102, 103) and accession_no like '%CT1805210190%' order by create_time DESC limit 50";
 
             start = new Date().getTime();
             queryWithSql(innodbSql, 100);
             System.out.println("innodb engine查询100次耗时：" + (new Date().getTime() - start));
 
             System.out.println("------------------------");
-        }
+//        }
 
-        start = new Date().getTime();
-        String memoryInsert = INSERT.replace("dw_doctor_task", "dw_doctor_task_memory");
-        insertWithSql(memoryInsert, 50);
-        System.out.println("memory engine插入50条数据耗时：" + (new Date().getTime() - start));
-        start = new Date().getTime();
-        String innodbInsert = INSERT.replace("dw_doctor_task", "dw_doctor_task_innoDB");
-        insertWithSql(innodbInsert, 50);
-        System.out.println("innodb engine插入50条数据耗时：" + (new Date().getTime() - start));
+//        start = new Date().getTime();
+//        String memoryInsert = INSERT.replace("dw_doctor_task", "dw_doctor_task_memory");
+//        insertWithSql(memoryInsert, 50);
+//        System.out.println("memory engine插入50条数据耗时：" + (new Date().getTime() - start));
+//        start = new Date().getTime();
+//        String innodbInsert = INSERT.replace("dw_doctor_task", "dw_doctor_task_innoDB");
+//        insertWithSql(innodbInsert, 50);
+//        System.out.println("innodb engine插入50条数据耗时：" + (new Date().getTime() - start));
 
         Thread.sleep(1000);
 //        JdbcTest test = new JdbcTest();
@@ -103,13 +105,13 @@ public class JdbcTest {
 
     private static void queryWithSql(String sql, int num) {
         try {
-            Connection conn = DriverManager.getConnection("jdbc:mysql://39.105.8.99/ris", "root", "Zjy12345+");
+            Connection conn = DriverManager.getConnection("jdbc:mysql://172.16.10.38/dw_cloud_ris", "root", "deepwise");
             Statement statement = conn.createStatement();
 
             for (int i = 0; i < num; i ++) {
-//                Date startDate = new Date();
+                Date startDate = new Date();
                 ResultSet rs = statement.executeQuery(sql);
-//                System.out.println("第" + (i+1) + "次执行耗时: " + (new Date().getTime() - startDate.getTime()));
+                System.out.println("第" + (i+1) + "次执行耗时: " + (new Date().getTime() - startDate.getTime()));
 
 //                while (rs.next()) {
 //                    String name = rs.getString("name");
