@@ -51,6 +51,9 @@ class Demo implements Serializable {
     transient private Integer age;
     private Integer weight;
 
+    // 如果序列化时没有指定UID，序列化成功之后，在增加或减少类的field，反序列化时会出现exception
+//    private String country;
+
     public String getName() {
         return name;
     }

@@ -54,9 +54,11 @@ public class JdbcTest {
 //            queryWithSql(memorySql, 100);
 //            System.out.println("memory engine查询100次耗时：" + (new Date().getTime() - start));
 //
-            //create_time <= '2018-12-12 14:00:00' and create_time > '2018-12-12 12:00:00' and accession_no like '%CT1805210190%'
-            String innodbSql = "SELECT id taskId, task_status, patient_name, patient_sex, patient_id, modality, ai_tag, accession_no, study_iuid, study_datetime, create_time, from_org_no, to_org_no, abandon_reason, abandon_time, task_level, (CASE WHEN from_org_no = 'sr_test_0009_001' THEN 0 ELSE 1 END) fromTag " +
-                    "FROM dw_doctor_task dt WHERE 1 = 1 AND create_time <= '2018-12-12 14:00:00' and create_time > '2018-12-12 12:00:00' AND from_org_no = 'sr_test_0009_001' AND task_status IN (101, 102, 103) and accession_no like '%CT1805210190%' order by create_time DESC limit 50";
+            //and create_time <= '2018-12-12 14:00:00' and create_time > '2018-12-12 12:00:00'
+            //and accession_no like '%CT18%'
+            //and patient_id like '%2914%'
+            //and study_datetime <= '2018-5-21 15:35:00' and study_datetime > '2018-5-21 15:30:00'
+            String innodbSql = "SELECT * FROM ((SELECT id taskId, task_status, modality, patient_name, accession_no, patient_id, patient_sex, allot_time, ai_tag, study_iuid, reject_tag, reject_date, report_doctor_id, review_doctor_id, update_time, study_datetime, from_org_no, to_org_no, task_level, create_time FROM dw_doctor_task WHERE task_level = 0 AND report_doctor_id = 100209 AND task_status IN (301, 302) AND create_time <= '2018-12-12 14:00:00' and create_time > '2018-12-12 12:00:00' ORDER BY CASE WHEN report_doctor_id = 100209 THEN 1 ELSE 2 END ASC, study_datetime DESC) UNION ALL (SELECT id taskId, task_status, modality, patient_name, accession_no, patient_id, patient_sex, allot_time, ai_tag, study_iuid, reject_tag, reject_date, report_doctor_id, review_doctor_id, update_time, study_datetime, from_org_no, to_org_no, task_level, create_time FROM dw_doctor_task WHERE task_level = 0 AND create_time <= '2018-12-12 14:00:00' and create_time > '2018-12-12 12:00:00' AND report_doctor_id IS NULL AND task_status IN (101, 102, 201) AND to_org_no IN ('sr_test_0009_001'))) AS TEMP WHERE 1 = 1 AND task_level = 0 AND create_time <= '2018-12-12 14:00:00' and create_time > '2018-12-12 12:00:00' and patient_id like '%2914%'  order by create_time limit 50";
 
             start = new Date().getTime();
             queryWithSql(innodbSql, 100);
