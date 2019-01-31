@@ -105,6 +105,7 @@ public class LambdaInstance {
     public void test5() {
         System.out.println("-------------->test5");
         List<Integer> list = Arrays.asList(1, 2, 3, 5, 6, 7);
+        // import static java.util.stream.Collectors.*;当有该引用的时候收集器可以写成collect(toList());
         List<Integer> resList = list.stream().filter(e -> e > 5).collect(Collectors.toList());
         resList.forEach(System.out::println);
 
