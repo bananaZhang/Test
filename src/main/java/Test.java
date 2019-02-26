@@ -1,8 +1,3 @@
-import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-
 /**
  * @author ZJY
  * @ClassName: Test
@@ -10,13 +5,8 @@ import java.util.List;
  * @date 2018/4/21 11:41
  */
 public class Test {
-    public static void main(String[] args) throws Exception {
-//        List<String> list = Arrays.asList("abc", " edf", "qqq ", " 12345 ");
-//        for (String s : list) {
-//            s = s.trim();
-//        }
-//        list.forEach(System.out::println);
-
-        System.out.println(LocalDateTime.now().toString());
+    public static void main(String[] args) {
+        System.out.println(System.getProperty("java.io.tmpdir"));
+        System.out.println(System.getProperty("os.name"));
     }
 }

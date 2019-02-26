@@ -1,4 +1,4 @@
-package thread;
+package thread.observer;
 
 import java.util.Observable;
 
