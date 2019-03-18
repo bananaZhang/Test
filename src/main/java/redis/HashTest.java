@@ -13,31 +13,9 @@ import redis.clients.jedis.JedisPubSub;
  */
 public class HashTest {
 
-    private static JedisPool jedisPool = null;
-    private static Jedis jedis = null;
-
-    public synchronized static void init() {
-        JedisPoolConfig config = new JedisPoolConfig();
-        config.setMaxIdle(200);
-
-        jedisPool = new JedisPool(config, "39.105.8.99", 6379, 0, null);
-    }
-
-    private static Jedis getJedis() {
-        try {
-            if (jedisPool == null) {
-                init();
-            }
-            jedis = jedisPool.getResource();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return jedis;
-    }
-
     public Long hset(String key, String field, String value, int expireTime) {
         Long result;
-        try (Jedis jedis = getJedis()) {
+        try (Jedis jedis = JedisFactory.getJedis()) {
             result = jedis.hset(key, field, value);
         }
         return result;
@@ -45,7 +23,7 @@ public class HashTest {
 
     public Long hsetnx(String key, String field, String value, int expireTime) {
         Long result;
-        try (Jedis jedis = getJedis()) {
+        try (Jedis jedis = JedisFactory.getJedis()) {
             result = jedis.hsetnx(key, field, value);
         }
         return result;
@@ -53,7 +31,7 @@ public class HashTest {
 
     public String hget(String key, String field) {
         String result;
-        try (Jedis jedis = getJedis()) {
+        try (Jedis jedis = JedisFactory.getJedis()) {
             result = jedis.hget(key, field);
         }
         return result;
@@ -61,14 +39,14 @@ public class HashTest {
 
     public String set(String key, String value) {
         String result;
-        try (Jedis jedis = getJedis()) {
+        try (Jedis jedis = JedisFactory.getJedis()) {
             result = jedis.set(key, value);
         }
         return result;
     }
 
     public void subscribe(String channelName) {
-        try (Jedis jedis = getJedis()) {
+        try (Jedis jedis = JedisFactory.getJedis()) {
             JedisPubSub subscriber = new JedisPubSub() {
                 @Override
                 public void onMessage(String channel, String message) {
@@ -92,7 +70,7 @@ public class HashTest {
 
     public Long publish(String channel, String msg) {
         Long result;
-        try (Jedis jedis = getJedis()) {
+        try (Jedis jedis = JedisFactory.getJedis()) {
             result = jedis.publish(channel, msg);
         }
         return result;

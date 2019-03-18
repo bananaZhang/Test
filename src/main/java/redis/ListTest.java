@@ -15,28 +15,6 @@ import java.io.ObjectOutputStream;
  */
 public class ListTest {
 
-    private static JedisPool jedisPool = null;
-    private static Jedis jedis = null;
-
-    public synchronized static void init() {
-        JedisPoolConfig config = new JedisPoolConfig();
-        config.setMaxIdle(200);
-
-        jedisPool = new JedisPool(config, "39.105.8.99", 6379, 0, null);
-    }
-
-    private static Jedis getJedis() {
-        try {
-            if (jedisPool == null) {
-                init();
-            }
-            jedis = jedisPool.getResource();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return jedis;
-    }
-
     /**
      * 将一个或多个值 value 插入到列表 key 的表头
      * 如果有多个 value 值，那么各个 value 值按从左到右的顺序依次插入到表头
@@ -45,7 +23,7 @@ public class ListTest {
      */
     public Long lpush(String key, String... items) {
         Long result;
-        try (Jedis jedis = getJedis()) {
+        try (Jedis jedis = JedisFactory.getJedis()) {
             result = jedis.lpush(key, items);
         }
         return result;
@@ -57,7 +35,7 @@ public class ListTest {
      */
     public String lpop(String key) {
         String result;
-        try (Jedis jedis = getJedis()) {
+        try (Jedis jedis = JedisFactory.getJedis()) {
             result = jedis.lpop(key);
         }
         return result;
@@ -70,7 +48,7 @@ public class ListTest {
      */
     public Long rpush(String key, String... items) {
         Long result;
-        try (Jedis jedis = getJedis()) {
+        try (Jedis jedis = JedisFactory.getJedis()) {
             result = jedis.rpush(key, items);
         }
         return result;
@@ -82,7 +60,7 @@ public class ListTest {
      */
     public String rpop(String key) {
         String result;
-        try (Jedis jedis = getJedis()) {
+        try (Jedis jedis = JedisFactory.getJedis()) {
             result = jedis.rpop(key);
         }
         return result;
@@ -97,7 +75,7 @@ public class ListTest {
 
 //        System.out.println(test.rpush("L1", "4"));
 
-        getJedis().expireAt("123:456", 1550318400);
+        JedisFactory.getJedis().expireAt("123:456", 1550318400);
 
     }
 }
