@@ -78,13 +78,26 @@ public class HashTest {
 
 
     public static void main(String[] args) throws InterruptedException {
-        HashTest test = new HashTest();
-        Long res = test.hsetnx("hash", "aaa", "111", 0);// 以":"形式隔开在redis中以分级文件夹形式展示
-        System.out.println("res = " + res);
-        System.out.println("redis get: " + test.hget("hash", "aaa"));
+        final HashTest test = new HashTest();
 
-        res = test.hsetnx("hash", "aaa", "222", 0);// 以":"形式隔开在redis中以分级文件夹形式展示
-        System.out.println("res = " + res);
-        System.out.println("redis get: " + test.hget("hash", "aaa"));
+        new Thread(() -> {
+            for (int i = 0; i < 10; i++) {
+                test.publish("channel", String.valueOf(i));
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+
+        new Thread(() -> {
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            test.subscribe("channel");
+        }).start();
     }
 }
