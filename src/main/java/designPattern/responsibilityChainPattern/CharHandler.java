@@ -7,6 +7,11 @@ package designPattern.responsibilityChainPattern;
  * @date 2019/3/30 10:51
  */
 public class CharHandler extends Handler {
+
+    public CharHandler(String name) {
+        super(name);
+    }
+
     @Override
     protected void handleRequest(String value) {
         if (value.contains("a")) {

@@ -7,6 +7,11 @@ package designPattern.responsibilityChainPattern;
  * @date 2019/3/30 11:04
  */
 public class DigitalHandler extends Handler {
+
+    public DigitalHandler(String name) {
+        super(name);
+    }
+
     @Override
     protected void handleRequest(String value) {
         if (value.contains("1")) {

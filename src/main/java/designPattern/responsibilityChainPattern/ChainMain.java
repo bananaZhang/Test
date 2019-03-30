@@ -8,12 +8,12 @@ package designPattern.responsibilityChainPattern;
  */
 public class ChainMain {
     public static void main(String[] args) {
-        CharHandler charHandler = new CharHandler();
-        DigitalHandler digitalHandler = new DigitalHandler();
-        SpecialCharHandler specialCharHandler = new SpecialCharHandler();
+        CharHandler charHandler = new CharHandler("CharHandler");
+        DigitalHandler digitalHandler = new DigitalHandler("DigitalHandler");
+        SpecialCharHandler specialCharHandler = new SpecialCharHandler("SpecialCharHandler");
         // 设置责任链
         charHandler.setNext(digitalHandler).setNext(specialCharHandler);
 
-        charHandler.handle("111aaa");
+        charHandler.handle("111_aaa");
     }
 }

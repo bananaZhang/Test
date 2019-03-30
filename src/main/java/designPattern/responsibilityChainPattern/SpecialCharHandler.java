@@ -7,6 +7,11 @@ package designPattern.responsibilityChainPattern;
  * @date 2019/3/30 11:05
  */
 public class SpecialCharHandler extends Handler {
+
+    public SpecialCharHandler(String name) {
+        super(name);
+    }
+
     @Override
     protected void handleRequest(String value) {
         if (value.contains("_")) {
