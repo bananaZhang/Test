@@ -1,3 +1,9 @@
+import javax.websocket.ClientEndpoint;
+import javax.websocket.ContainerProvider;
+import javax.websocket.Session;
+import javax.websocket.WebSocketContainer;
+import java.io.IOException;
+import java.net.URI;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
@@ -7,31 +13,48 @@ import java.util.concurrent.Executors;
  * @Description: Test
  * @date 2018/4/21 11:41
  */
+@ClientEndpoint
 public class Test {
 
-    public static Executor executor = Executors.newFixedThreadPool(5);
-    public static Object lock = new Object();
 
-    public static void main(String[] args) {
-        Task task1 = new Task();
-        Task task2 = new Task();
-        executor.execute(task1);
-        executor.execute(task2);
+    private String deviceId;
+
+    private Session session;
+
+    public Test () {
+
     }
 
-    static class Task implements Runnable {
-        @Override
-        public void run() {
-            synchronized (lock) {
-                calculate();
-            }
-        }
+    public Test (String deviceId) {
+        this.deviceId = deviceId;
+    }
 
-        public void calculate() {
-            int i = 0;
-            while (true) {
-                i++;
-            }
+    protected boolean start() {
+        WebSocketContainer Container = ContainerProvider.getWebSocketContainer();
+        String uri = "ws://172.16.30.21:8181/demo/socket/1";
+        System.out.println("Connecting to " + uri);
+        try {
+            session = Container.connectToServer(Test.class, URI.create(uri));
+            System.out.println("count: " + deviceId);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
         }
+        return true;
+    }
+
+    public static void main(String[] args) throws IOException {
+        try {
+            for (int i = 1; i < 50; i++) {
+                Test wSocketTest = new Test(String.valueOf(i));
+                if (!wSocketTest.start()) {
+                    System.out.println("测试结束！");
+                    break;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        System.in.read();
     }
 }
