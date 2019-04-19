@@ -1,5 +1,8 @@
 package thread.threadorder;
 
+/**
+ * 基于join机制的线程顺序执行
+ */
 public class JoinExecution {
 
     public static void main(String[] args) throws InterruptedException {

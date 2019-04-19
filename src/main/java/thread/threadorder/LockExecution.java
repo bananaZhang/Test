@@ -1,5 +1,9 @@
 package thread.threadorder;
 
+/**
+ * 基于wait/notify机制的线程顺序执行
+ * @author ZJY 2019/04/19 19:46
+ */
 public class LockExecution {
 
     private volatile int orderNum = 1;
