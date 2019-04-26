@@ -6,6 +6,9 @@ public class Person {
     private String sex;
     private String country;
 
+    public Person() {
+    }
+
     public Person(String id, Integer age, String sex, String country) {
         this.id = id;
         this.age = age;
