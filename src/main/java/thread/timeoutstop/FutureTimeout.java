@@ -16,11 +16,8 @@ public class FutureTimeout {
         Task task1 = new Task("task1");
         Future<String> resultOfTask1 = pool.submit(task1);
 
-        Task task2 = new Task("task2");
-        Future<String> resultOfTask2 = pool.submit(task2);
         try {
-//            System.out.println(resultOfTask1.get(2, TimeUnit.SECONDS));
-            System.out.println(resultOfTask2.get(4, TimeUnit.SECONDS));
+            System.out.println(resultOfTask1.get(2, TimeUnit.SECONDS));
         } catch (InterruptedException e) {
             System.out.println("future在睡着时被打断");
             pool.shutdown();
@@ -29,6 +26,7 @@ public class FutureTimeout {
             pool.shutdown();
         } catch (TimeoutException e) {
             System.out.println("future时间超时");
+            resultOfTask1.cancel(true);
         } finally {
             pool.shutdown();
         }
