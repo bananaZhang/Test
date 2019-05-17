@@ -6,7 +6,6 @@ import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * 可重入锁实现
- * // TODO 有问题
  */
 public class TestB {
 
@@ -31,26 +30,27 @@ public class TestB {
 
         @Override
         public void run() {
-            try {
-                Thread.sleep(3000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            lock.lock();
-            try {
-                while (count == FULL) {
-                    try {
-                        notFull.await();
-                        System.out.println("生产者" + Thread.currentThread().getName() + "await");
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+            for (int i = 0; i < 10; i++) {
+                try {
+                    Thread.sleep(3000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
-                count ++;
-                System.out.println(Thread.currentThread().getName() + "生产者生产，目前总共有" + count);
-                notEmpty.signal();
-            } finally {
-                lock.unlock();
+                lock.lock();
+                try {
+                    while (count == FULL) {
+                        try {
+                            notFull.await();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    count++;
+                    System.out.println(Thread.currentThread().getName() + "生产者生产，目前总共有" + count);
+                    notEmpty.signal();
+                } finally {
+                    lock.unlock();
+                }
             }
         }
     }
@@ -69,7 +69,6 @@ public class TestB {
                     while (count == 0) {
                         try {
                             notEmpty.await();
-                            System.out.println("消费者" + Thread.currentThread().getName() + "await");
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
