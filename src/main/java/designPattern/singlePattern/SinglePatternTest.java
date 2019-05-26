@@ -69,10 +69,9 @@ class Singleton4 {
  * DCL(Double Check Lock)写法
  * */
 class Singleton {
-    private volatile static Singleton instance;// 必须要被声明为volatile，否则会导致得到部分初始化对象问题
-
-    public int f1 = 1;   // 触发部分初始化问题
-    public int f2 = 2;
+    // 必须要被声明为volatile，否则会导致得到部分初始化对象问题（jvm创建了Singlton实例分配了空白内存并赋值给instance，但还没有初始化）
+    // https://blog.csdn.net/a_lonely_dancer/article/details/52445402
+    private volatile static Singleton instance;
 
     private Singleton(){}
 
