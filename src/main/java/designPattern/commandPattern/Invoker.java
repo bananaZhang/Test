@@ -1,7 +1,7 @@
 package designPattern.commandPattern;
 
 /**
- * 客户端调用者
+ * 客户端调用者，持有一个命令对象
  */
 public class Invoker {
     private Command command;
