@@ -9,8 +9,8 @@ import java.util.Properties;
 
 public class SendMail {
 
-    private static final String SMTP_HOST = "smtp.netease.com";
-    private static final String SMTP_PORT = "25";
+    private static final String SMTP_HOST = "localhost";
+    private static final String SMTP_PORT = "10025";
 
     public static void main(String[] args) throws Exception {
         // 1. 创建参数配置, 用于连接邮件服务器的参数配置
@@ -52,10 +52,10 @@ public class SendMail {
         message.setRecipient(MimeMessage.RecipientType.TO, new InternetAddress(receiveMail));
 
         // 4. Subject: 邮件主题
-        message.setSubject("subject xixi", "UTF-8");
+        message.setSubject("我是主题", "UTF-8");
 
         // 5. Content: 邮件正文（可以使用html标签）
-        message.setContent("data:lala", "text/html;charset=UTF-8");
+        message.setContent("我是正文hahhgg，我跟你哥噢33", "text/html;charset=UTF-8");
 
         // 6. 设置发件时间
         message.setSentDate(new Date());
