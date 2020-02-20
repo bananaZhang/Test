@@ -12,8 +12,14 @@ public class CatchExceptionWithThreadPool {
             printException(r, t);
         }
 
+        /**
+         * 注意：在这里如果是用executorService.submit方法执行的线程，这里的t为null；
+         * 如果是用executorService.execute方法执行的线程，t则为线程执行时抛出的异常
+         */
         private void printException(Runnable r, Throwable t) {
-
+            /**
+             * t == null的情况使用future.get()来获取线程执行的异常
+             */
             if (t == null && r instanceof Future<?>) {
                 try {
                     Object result = ((Future<?>) r).get();
@@ -39,6 +45,9 @@ public class CatchExceptionWithThreadPool {
     }
 
     private static void executeTask() {
+        /**
+         * submit方法都会返回一个Future对象
+         */
         executorService.submit(new MyTask());
         try {
             TimeUnit.SECONDS.sleep(1);
