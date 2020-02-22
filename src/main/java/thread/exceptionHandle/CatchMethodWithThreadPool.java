@@ -1,6 +1,6 @@
 package thread.exceptionHandle;
 
-public class CatchMethodWithSubmit {
+public class CatchMethodWithThreadPool {
     /**
      * 用线程组的方式统一捕获组内的所有异常
      */

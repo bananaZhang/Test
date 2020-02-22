@@ -13,8 +13,10 @@ public class CatchExceptionWithThreadPool {
         }
 
         /**
-         * 注意：在这里如果是用executorService.submit方法执行的线程，这里的t为null；
+         * 注意：在这里如果是用executorService.submit方法执行的线程，这里的t为null
+         * （因为submit会将Runnable包装成FutureTask，在FutureTask的run方法中把异常吃掉了）；
          * 如果是用executorService.execute方法执行的线程，t则为线程执行时抛出的异常
+         * 参考：https://segmentfault.com/a/1190000000669942
          */
         private void printException(Runnable r, Throwable t) {
             /**
