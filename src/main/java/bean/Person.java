@@ -1,5 +1,7 @@
 package bean;
 
+import java.util.Objects;
+
 public class Person {
     private String id;
     private Integer age;
@@ -46,5 +48,21 @@ public class Person {
 
     public void setCountry(String country) {
         this.country = country;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Person person = (Person) o;
+        return Objects.equals(id, person.id) &&
+                Objects.equals(age, person.age) &&
+                sex.equals(person.sex) &&
+                country.equals(person.country);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, age, sex, country);
     }
 }
