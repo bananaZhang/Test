@@ -65,4 +65,14 @@ public class Person {
     public int hashCode() {
         return Objects.hash(id, age, sex, country);
     }
+
+    @Override
+    public String toString() {
+        return "Person{" +
+                "id='" + id + '\'' +
+                ", age=" + age +
+                ", sex='" + sex + '\'' +
+                ", country='" + country + '\'' +
+                '}';
+    }
 }
