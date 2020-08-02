@@ -1,11 +1,18 @@
+import bean.Person;
+
 import javax.websocket.ClientEndpoint;
 import javax.websocket.ContainerProvider;
 import javax.websocket.Session;
 import javax.websocket.WebSocketContainer;
 import java.io.IOException;
 import java.net.URI;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 /**
  * @author ZJY
@@ -44,17 +51,8 @@ public class Test {
     }
 
     public static void main(String[] args) throws IOException {
-        try {
-            for (int i = 1; i < 50; i++) {
-                Test wSocketTest = new Test(String.valueOf(i));
-                if (!wSocketTest.start()) {
-                    System.out.println("测试结束！");
-                    break;
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        System.in.read();
+        Person p = new Person();
+        System.out.println(p.getClass().getTypeName());
+        System.out.println(IOException.class.getSimpleName());
     }
 }
