@@ -12,12 +12,12 @@ public class GroupByAndToMap {
 
     public static void main(String[] args) {
         List<Person> people = initData();
-        // 根据年龄分组
+        // 根据年龄分组(toMap可以生成1:1的关系)
         Map<Integer, Person> ageMap = people.stream().collect(Collectors.toMap(Person::getAge, e -> e));
         for (Map.Entry<Integer, Person> entry : ageMap.entrySet()) {
             System.out.println(entry.getKey() + "=" + entry.getValue());
         }
-        // 根据国家分成map
+        // 根据国家分成map(groupBy是把相同key的放到一个list)
         Map<String, List<Person>> countryMap = people.stream().collect(Collectors.groupingBy(Person::getCountry));
         for (Map.Entry<String, List<Person>> entry : countryMap.entrySet()) {
             System.out.println(entry.getKey() + "=" + entry.getValue());
