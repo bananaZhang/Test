@@ -2,22 +2,33 @@ package lambda;
 
 import bean.Person;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class GroupByAndToMap {
 
     public static void main(String[] args) {
         List<Person> people = initData();
-        // 根据年龄分组(toMap可以生成1:1的关系)
-        Map<Integer, Person> ageMap = people.stream().collect(Collectors.toMap(Person::getAge, e -> e));
-        for (Map.Entry<Integer, Person> entry : ageMap.entrySet()) {
+        /**
+         * toMap可以生成1:1的关系
+         */
+        Map<String, Person> idMap = people.stream().collect(Collectors.toMap(Person::getId, e -> e));
+        for (Map.Entry<String, Person> entry : idMap.entrySet()) {
             System.out.println(entry.getKey() + "=" + entry.getValue());
         }
-        // 根据国家分成map(groupBy是把相同key的放到一个list)
+        // 或者使用
+        idMap = people.stream().collect(Collectors.toMap(Person::getId, Function.identity()));
+        // 当toMap方法有重复的时候，上面的写法会抛出Duplicate key异常，可以通过下面的方式解决
+        // (p1, p2) -> p1 表示只保留第一个值
+        Map<String, Person> sexMap = people.stream().collect(Collectors.toMap(Person::getSex,
+                Function.identity(), (p1, p2) -> p1));
+        // 也可以通过toMap转成自己想要的map类型
+        TreeMap<String, Person> idTreeMap = people.stream().collect(Collectors.toMap(Person::getId, Function.identity(),
+                (p1, p2) -> p1, TreeMap::new));
+        /**
+         * 根据国家分成map(groupBy是把相同key的放到一个list)
+         */
         Map<String, List<Person>> countryMap = people.stream().collect(Collectors.groupingBy(Person::getCountry));
         for (Map.Entry<String, List<Person>> entry : countryMap.entrySet()) {
             System.out.println(entry.getKey() + "=" + entry.getValue());
